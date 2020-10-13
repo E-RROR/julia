@@ -1380,7 +1380,7 @@ function normalize_keys(keymap::Union{Dict{Char,Any},AnyDict})
     return ret
 end
 
-function add_nested_key!(keymap::Dict, key, value; override = false)
+function add_nested_key!(keymap::Dict, key::Union{String, Char}, value; override = false)
     y = iterate(key)
     while y !== nothing
         c, i = y
@@ -1559,6 +1559,7 @@ function keymap_merge(target::Dict{Char,Any}, source::Union{Dict{Char,Any},AnyDi
     end
     # then redirected entries
     for key in setdiff(keys(source), keys(direct_keys))
+        key::Union{String, Char}
         # We first resolve redirects in the source
         value = source[key]
         visited = Vector{Any}()
@@ -1577,7 +1578,7 @@ function keymap_merge(target::Dict{Char,Any}, source::Union{Dict{Char,Any},AnyDi
         if isa(value, Union{Char,String})
             value = getEntry(ret, value)
             if value === nothing
-                error("Could not find redirected value " * escape_string(source[key]))
+                error("Could not find redirected value " * escape_string(String(source[key])))
             end
         end
         add_nested_key!(ret, key, value; override = true)
